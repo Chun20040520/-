@@ -1,0 +1,118 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyP/RmrBmWO/1cmIv6pq0amr",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Chun20040520/-/blob/main/Homework/%E5%9F%BA%E6%9C%AC%E7%89%A9%E4%BB%B6%E5%B0%8E%E5%90%91%E6%9C%9F%E6%9C%AB%E5%A0%B1%E5%91%8A\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "uh2t5AJ4EGid"
+      },
+      "outputs": [],
+      "source": [
+        "!pip install requests beautifulsoup4 matplotlib"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import requests\n",
+        "from bs4 import BeautifulSoup\n",
+        "import matplotlib.pyplot as plt\n",
+        "\n",
+        "def scrape_cathaylife():\n",
+        "    url = \"https://www.cathaylife.com.tw/cathaylife/abouts/financial-info\"\n",
+        "\n",
+        "    # 使用 headers 模擬瀏覽器的使用者代理\n",
+        "    headers = {\n",
+        "        \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3\"}\n",
+        "\n",
+        "    try:\n",
+        "        response = requests.get(url, headers=headers)\n",
+        "        response.raise_for_status()\n",
+        "    except requests.exceptions.HTTPError as errh:\n",
+        "        print(\"HTTP Error:\", errh)\n",
+        "    except requests.exceptions.ConnectionError as errc:\n",
+        "        print(\"Error Connecting:\", errc)\n",
+        "    except requests.exceptions.Timeout as errt:\n",
+        "        print(\"Timeout Error:\", errt)\n",
+        "    except requests.exceptions.RequestException as err:\n",
+        "        print(\"Error:\", err)\n",
+        "        return None, None\n",
+        "\n",
+        "    soup = BeautifulSoup(response.text, \"html.parser\")\n",
+        "\n",
+        "    # 在這裡找到營業收入相關的元素，這部分需要查看網頁原始碼\n",
+        "    # 以確定如何正確提取資料，以下僅為示範\n",
+        "    income_data = soup.find_all(\"span\", class_=\"income-data\")\n",
+        "\n",
+        "    # 提取資料\n",
+        "    labels = [\"營業收入額 本月\", \"去年同期\", \"增減金額\", \"增減百分比\",\n",
+        "              \"本年累計\", \"去年累計\", \"增減金額\", \"增減百分比\"]\n",
+        "\n",
+        "    if income_data:\n",
+        "        values = [int(data.text.strip().replace(',', '')) for data in income_data]\n",
+        "        return labels, values\n",
+        "    else:\n",
+        "        print(\"未能成功取得資料，無法繪製圖表。\")\n",
+        "        return None, None\n",
+        "\n",
+        "def plot_line_chart(labels, values):\n",
+        "    if labels and values:\n",
+        "        plt.plot(labels, values, marker='o')\n",
+        "        plt.title(\"Cathay Life Financial Info\")\n",
+        "        plt.xlabel(\"Category\")\n",
+        "        plt.ylabel(\"Value\")\n",
+        "        plt.xticks(rotation=45, ha=\"right\")\n",
+        "        plt.tight_layout()\n",
+        "        plt.show()\n",
+        "\n",
+        "if __name__ == \"__main__\":\n",
+        "    labels, values = scrape_cathaylife()\n",
+        "    if labels and values:\n",
+        "        plot_line_chart(labels, values)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "92nyP5klH2VC",
+        "outputId": "2d060f1c-7067-452e-c6e6-97c631845e06"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "未能成功取得資料，無法繪製圖表。\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
